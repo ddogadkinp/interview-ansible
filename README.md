@@ -35,9 +35,8 @@ server.listen(port, (err) => {
 ```
 ### How to RUN NodeJS HTTP server with pm2
 
-`pm2 start <location_of_index_js>/index.js`
-    - to start a single NodeJS HTTP server 
-`sudo pm2 startup` 
-    - to setup init scripts
-`pm reload <ecosystem_config_file> --update-env` 
-    - to reload nodejs apps ecosystem
+`pm2 start <location_of_index_js>/index.js` - to start a single NodeJS HTTP server 
+
+`sudo pm2 startup` - to setup init scripts
+
+`pm reload <ecosystem_config_file> --update-env` - to reload nodejs apps ecosystem
