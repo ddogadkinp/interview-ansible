@@ -1,0 +1,17 @@
+error_log stderr;
+
+events {
+  worker_connections 1024;
+}
+
+http {
+  server {
+    listen 8089 default_server;
+
+    {% for server in nodejs_http_servers_sequence %}
+        location /server{{ server }} {
+          proxy_pass http://localhost:{{ server }};
+        }
+    {% endfor %}
+  }
+}

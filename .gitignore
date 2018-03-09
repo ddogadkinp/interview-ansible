@@ -144,3 +144,12 @@ local.properties
 .cache-main
 .scala_dependencies
 .worksheet
+
+# AWS env
+.c9
+
+# Interview env
+server*
+ecosystem.config.js
+*.retry
+node_modules

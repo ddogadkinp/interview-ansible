@@ -1,1 +1,63 @@
 ---
+- hosts: localhost
+  vars: 
+    server_count: 3
+    server_port_start: 3000
+    workspace: "/home/ec2-user/environment"
+  tasks:
+  
+    - name: Install nodejs
+      yum:
+        name: nodejs
+      become: yes
+      
+    - name: Install nginx
+      yum:
+        name: nginx
+      become: yes
+      
+    - name: Install pm2 node.js package.
+      npm:
+        name: pm2
+        global: yes
+        state: present
+      
+    - name: Create directories for nodejs http server
+      file: 
+        path: "{{ workspace }}/server{{ item }}" 
+        state: directory
+      with_sequence: start="{{ server_port_start }}" count="{{ server_count }}"
+      
+    - name: Prepare nodejs http servers
+      template:
+        src: "{{ workspace }}/nodejs-http-server.js.j2"
+        dest: "{{ workspace }}/server{{ item }}/index.js"
+      with_sequence: start="{{ server_port_start }}" count="{{ server_count }}"
+      register: nodejs_hettp_servers
+      
+    - set_fact:
+        nodejs_http_servers_sequence: "{{ nodejs_hettp_servers.results | map(attribute='item') | list }}"
+      
+    - name: Update pm2 configuration
+      template: 
+        src: "{{ workspace }}/pm2-ecosystem-config.js.j2"
+        dest: "{{ workspace }}/ecosystem.config.js"
+      notify: reload_pm2
+      
+    - name: Update nginx configuration
+      template: 
+        src: "{{ workspace }}/nginx.conf.j2"
+        dest: "/etc/nginx/nginx.conf"
+      become: yes
+      notify: restart_nginx
+      
+      
+  handlers:
+    - name: reload_pm2
+      shell: "pm2 reload {{ workspace }}/ecosystem.config.js --update-env"
+      
+    - name: restart_nginx
+      service: 
+        name: nginx 
+        state: restarted
+      become: yes

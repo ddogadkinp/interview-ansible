@@ -1,0 +1,10 @@
+module.exports = {
+  apps : [
+      {% for server in nodejs_http_servers_sequence %}
+        {
+          name   : "server{{ server }}",
+          script : "/home/ec2-user/environment/server{{ server }}/index.js"
+        },
+      {% endfor %}
+  ]
+}
